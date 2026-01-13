@@ -3,6 +3,71 @@ import string
 import io
 
 
+class WordBoundarySet(set):
+    """
+    A set-like object that checks if a character is a word character or not.
+    It supports all alphanumeric unicode characters as word characters by default.
+    """
+    def __init__(self, initial_chars=None):
+        super(WordBoundarySet, self).__init__(initial_chars or [])
+        self.excluded_chars = set()
+
+    def __contains__(self, char):
+        # If explicitly excluded, it's not a word char (it's a boundary)
+        if char in self.excluded_chars:
+            return False
+        
+        # If in the explicit set (legacy behavior), it's a word char
+        if super(WordBoundarySet, self).__contains__(char):
+            return True
+            
+        # If it's a valid Unicode letter/number, it's a word char
+        # BUT for CJK scripts (Chinese, Japanese, Korean), characters are self-delimited
+        # and should strictly be treated as boundaries for the algorithm to work.
+        if char.isalnum():
+            # Check for CJK ranges
+            # CJK Unified Ideographs: 4E00-9FFF
+            # Hiragana: 3040-309F
+            # Katakana: 30A0-30FF
+            # Hangul: AC00-D7AF
+            # CJK Extensions: 3400-4DBF, 20000-2A6DF, etc. (Simplification: check common ranges)
+            code = ord(char)
+            if (0x4E00 <= code <= 0x9FFF or  # CJK Unified
+                0x3400 <= code <= 0x4DBF or  # CJK Ext A
+                0x3040 <= code <= 0x309F or  # Hiragana
+                0x30A0 <= code <= 0x30FF or  # Katakana
+                0xAC00 <= code <= 0xD7AF):   # Hangul Syllables
+                return False
+            return True
+            
+        return False
+
+    def add(self, element):
+        """Add a character to the set of word characters (make it NOT a boundary)"""
+        self.excluded_chars.discard(element)
+        super(WordBoundarySet, self).add(element)
+
+    def remove(self, element):
+        """Remove a character from word characters (make it a boundary)"""
+        # If it's alphanumeric but not in the set, we just add to excluded
+        if self.__contains__(element): # check if it effectively exists
+             self.excluded_chars.add(element)
+             super(WordBoundarySet, self).discard(element)
+        else:
+             raise KeyError(element)
+
+    def discard(self, element):
+        """Remove a character from word characters if present (make it a boundary)"""
+        if self.__contains__(element):
+            self.excluded_chars.add(element)
+            super(WordBoundarySet, self).discard(element)
+
+    def copy(self):
+        new_set = WordBoundarySet(self)
+        new_set.excluded_chars = self.excluded_chars.copy()
+        return new_set
+
+
 class KeywordProcessor(object):
     """KeywordProcessor
 
@@ -45,10 +110,10 @@ class KeywordProcessor(object):
         self._white_space_chars = set(['.', '\t', '\n', '\a', ' ', ','])
         try:
             # python 2.x
-            self.non_word_boundaries = set(string.digits + string.letters + '_')
+            self.non_word_boundaries = WordBoundarySet(string.digits + string.letters + '_')
         except AttributeError:
             # python 3.x
-            self.non_word_boundaries = set(string.digits + string.ascii_letters + '_')
+            self.non_word_boundaries = WordBoundarySet(string.digits + string.ascii_letters + '_')
         self.keyword_trie_dict = dict()
         self.case_sensitive = case_sensitive
         self._terms_in_trie = 0
