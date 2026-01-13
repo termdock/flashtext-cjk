@@ -2,6 +2,7 @@ import os
 import string
 import io
 import json
+import re
 
 
 class WordBoundarySet(set):
@@ -688,23 +689,23 @@ class KeywordProcessor(object):
         return [value[0] for value in keywords_extracted]
 
     def replace_keywords(self, sentence, max_cost=0):
-        """Searches in the string for all keywords present in corpus.
-        Keywords present are replaced by the clean name and a new string is returned.
+        """
+        Search for keywords and replace them with the associated name in the
+        KeywordProcessor.
 
         Args:
-            sentence (str): Line of text where we will replace keywords
+            sentence (str): Line of text where we will search for keywords
+            max_cost (int): Maximum levenshtein distance for fuzzy matching
 
         Returns:
             new_sentence (str): Line of text with replaced keywords
 
         Examples:
-            >>> from flashtext import KeywordProcessor
             >>> keyword_processor = KeywordProcessor()
             >>> keyword_processor.add_keyword('Big Apple', 'New York')
-            >>> keyword_processor.add_keyword('Bay Area')
-            >>> new_sentence = keyword_processor.replace_keywords('I love Big Apple and bay area.')
+            >>> new_sentence = keyword_processor.replace_keywords('I love Big Apple and new york')
             >>> new_sentence
-            >>> 'I love New York and Bay Area.'
+            >>> 'I love New York and New York'
 
         """
         if not sentence:
@@ -732,6 +733,48 @@ class KeywordProcessor(object):
         new_sentence.append(sentence[last_end:])
         
         return ''.join(new_sentence)
+
+    def extract_sentences(self, text, delimiters=None):
+        """
+        Extract sentences that contain keywords.
+        
+        Args:
+            text (str): Input text
+            delimiters (list of str): Punctuation to split sentences. 
+                                      Default: ['.', '?', '!', ';', '\\n']
+        Returns:
+            list of (str, list): [(sentence, [keywords]), ...]
+        """
+        if delimiters is None:
+            delimiters = ['.', '?', '!', ';', '\n']
+        
+        # Sort delimiters by length desc to ensure longest match first if they overlap
+        delimiters.sort(key=len, reverse=True)
+        
+        escaped_delimiters = [re.escape(d) for d in delimiters]
+        pattern = '|'.join(escaped_delimiters)
+        
+        # (pattern) captures the delimiter so we can attach it back
+        regex_pattern = '((?:' + pattern + ')+)'
+        
+        parts = re.split(regex_pattern, text)
+        
+        sentences_list = []
+        # parts structure: [content, delimiter, content, delimiter...]
+        for i in range(0, len(parts), 2):
+            sentence_content = parts[i]
+            delimiter = parts[i+1] if i + 1 < len(parts) else ""
+            full_sentence = sentence_content + delimiter
+            if full_sentence.strip(): 
+                 sentences_list.append(full_sentence)
+                 
+        results = []
+        for sent in sentences_list:
+            keywords = self.extract_keywords(sent)
+            if keywords:
+                results.append((sent, keywords))
+        
+        return results
 
     def get_next_word(self, sentence):
         """
