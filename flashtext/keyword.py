@@ -475,8 +475,9 @@ class KeywordProcessor(object):
         if not sentence:
             # if sentence is empty or none just return empty list
             return keywords_extracted
-        if not self.case_sensitive:
-            sentence = sentence.lower()
+        # Note: Do NOT convert entire sentence to lowercase here.
+        # Unicode chars like Turkish İ change length when lowercased (İ -> i̇).
+        # Instead, we lowercase each character individually to preserve span positions.
         current_dict = self.keyword_trie_dict
         sequence_start_pos = 0
         sequence_end_pos = 0
@@ -486,6 +487,8 @@ class KeywordProcessor(object):
         curr_cost = max_cost
         while idx < sentence_len:
             char = sentence[idx]
+            if not self.case_sensitive:
+                char = char.lower()
             # when we reach a character that might denote word end
             longest_sequence_found = None
             if char not in self.non_word_boundaries:
@@ -507,6 +510,8 @@ class KeywordProcessor(object):
                         idy = idx + 1
                         while idy < sentence_len:
                             inner_char = sentence[idy]
+                            if not self.case_sensitive:
+                                inner_char = inner_char.lower()
                             if self._keyword in current_dict_continued:
                                 # Check if we should accept this match:
                                 # 1. If next char is a word boundary (not in non_word_boundaries), OR
@@ -551,7 +556,7 @@ class KeywordProcessor(object):
                     current_dict = self.keyword_trie_dict
                     reset_current_dict = True
             elif char in current_dict:
-                # we can continue from this char
+                # we can continue from this char (char is already lowercased if needed)
                 current_dict = current_dict[char]
             elif curr_cost > 0:
                 next_word = self.get_next_word(sentence[idx:])
@@ -568,8 +573,10 @@ class KeywordProcessor(object):
                 # skip to end of word
                 idy = idx + 1
                 while idy < sentence_len:
-                    char = sentence[idy]
-                    if char not in self.non_word_boundaries:
+                    skip_char = sentence[idy]
+                    if not self.case_sensitive:
+                        skip_char = skip_char.lower()
+                    if skip_char not in self.non_word_boundaries:
                         break
                     idy += 1
                 idx = idy
