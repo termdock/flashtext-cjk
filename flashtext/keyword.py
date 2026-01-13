@@ -507,11 +507,16 @@ class KeywordProcessor(object):
                         idy = idx + 1
                         while idy < sentence_len:
                             inner_char = sentence[idy]
-                            if inner_char not in self.non_word_boundaries and self._keyword in current_dict_continued:
-                                # update longest sequence found
-                                longest_sequence_found = current_dict_continued[self._keyword]
-                                sequence_end_pos = idy
-                                is_longer_seq_found = True
+                            if self._keyword in current_dict_continued:
+                                # Check if we should accept this match:
+                                # 1. If next char is a word boundary (not in non_word_boundaries), OR
+                                # 2. If last matched char is CJK (not in non_word_boundaries) - CJK doesn't need word boundaries
+                                last_matched_char = sentence[idy - 1] if idy > 0 else ''
+                                if inner_char not in self.non_word_boundaries or last_matched_char not in self.non_word_boundaries:
+                                    # update longest sequence found
+                                    longest_sequence_found = current_dict_continued[self._keyword]
+                                    sequence_end_pos = idy
+                                    is_longer_seq_found = True
                             if inner_char in current_dict_continued:
                                 current_dict_continued = current_dict_continued[inner_char]
                             elif curr_cost > 0:
