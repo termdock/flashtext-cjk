@@ -9,6 +9,7 @@ import re
 
 
 from .trie_dict import add_keyword_to_trie, remove_keyword_from_trie, get_all_keywords
+from .utils import levensthein, extract_sentences_util
 
 
 class KeywordProcessor(object):
@@ -704,36 +705,7 @@ class KeywordProcessor(object):
         Returns:
             list of (str, list): [(sentence, [keywords]), ...]
         """
-        if delimiters is None:
-            delimiters = ['.', '?', '!', ';', '\n']
-        
-        # Sort delimiters by length desc to ensure longest match first if they overlap
-        delimiters.sort(key=len, reverse=True)
-        
-        escaped_delimiters = [re.escape(d) for d in delimiters]
-        pattern = '|'.join(escaped_delimiters)
-        
-        # (pattern) captures the delimiter so we can attach it back
-        regex_pattern = '((?:' + pattern + ')+)'
-        
-        parts = re.split(regex_pattern, text)
-        
-        sentences_list = []
-        # parts structure: [content, delimiter, content, delimiter...]
-        for i in range(0, len(parts), 2):
-            sentence_content = parts[i]
-            delimiter = parts[i+1] if i + 1 < len(parts) else ""
-            full_sentence = sentence_content + delimiter
-            if full_sentence.strip(): 
-                 sentences_list.append(full_sentence)
-                 
-        results = []
-        for sent in sentences_list:
-            keywords = self.extract_keywords(sent)
-            if keywords:
-                results.append((sent, keywords))
-        
-        return results
+        return extract_sentences_util(text, self.extract_keywords, delimiters)
 
     def get_next_word(self, sentence):
         """
@@ -795,28 +767,5 @@ class KeywordProcessor(object):
             >>> ({' ': {'B': {'l': {'a': {'n': {'c': {'_keyword_': 'Mary'}}}}}}}, 1, 5)
         """
         start_node = start_node or self.keyword_trie_dict
-        rows = range(len(word) + 1)
+        yield from levensthein(word, max_cost, start_node, self._white_space_chars, self._keyword)
 
-        for char, node in start_node.items():
-            yield from self._levenshtein_rec(char, node, word, rows, max_cost, depth=1)
-
-
-    def _levenshtein_rec(self, char, node, word, rows, max_cost, depth=0):
-        n_columns = len(word) + 1
-        new_rows = [rows[0] + 1]
-        cost = 0
-
-        for col in range(1, n_columns):
-            insert_cost = new_rows[col - 1] + 1
-            delete_cost = rows[col] + 1
-            replace_cost = rows[col - 1] + int(word[col - 1] != char)
-            cost = min((insert_cost, delete_cost, replace_cost))
-            new_rows.append(cost)
-
-        stop_crit = isinstance(node, dict) and node.keys() & (self._white_space_chars | {self._keyword})
-        if new_rows[-1] <= max_cost and stop_crit:
-            yield node, cost, depth
-
-        elif isinstance(node, dict) and min(new_rows) <= max_cost:
-            for new_char, new_node in node.items():
-                yield from self._levenshtein_rec(new_char, new_node, word, new_rows, max_cost, depth=depth + 1)
