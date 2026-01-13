@@ -108,6 +108,14 @@ keywords_with_span = kp.extract_keywords(text, span_info=True)
 new_text = kp.replace_keywords(text)
 # 'I love Python and Machine Learning'
 
+# Get replacement details (New in v3.1.0)
+new_text, replacements = kp.replace_keywords(text, span_info=True)
+# replacements = [
+#     {'original': 'Python', 'replacement': 'Python', 'start': 7, 'end': 13},
+#     {'original': '機器學習', 'replacement': 'Machine Learning', 'start': 18, 'end': 22}
+# ]
+
+
 # Extract sentences with keywords (New in v3.1.0)
 sentences = kp.extract_sentences(text)
 # [('I love Python and 機器學習', ['Python', 'Machine Learning'])]
