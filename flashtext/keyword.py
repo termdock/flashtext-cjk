@@ -688,7 +688,7 @@ class KeywordProcessor(object):
             return keywords_extracted
         return [value[0] for value in keywords_extracted]
 
-    def replace_keywords(self, sentence, max_cost=0):
+    def replace_keywords(self, sentence, max_cost=0, span_info=False):
         """
         Search for keywords and replace them with the associated name in the
         KeywordProcessor.
@@ -696,9 +696,11 @@ class KeywordProcessor(object):
         Args:
             sentence (str): Line of text where we will search for keywords
             max_cost (int): Maximum levenshtein distance for fuzzy matching
+            span_info (bool): If True, return tuple (new_sentence, list_of_replacements)
 
         Returns:
             new_sentence (str): Line of text with replaced keywords
+            (optional) replacements (list): List of dicts with replacement details
 
         Examples:
             >>> keyword_processor = KeywordProcessor()
@@ -710,29 +712,46 @@ class KeywordProcessor(object):
         """
         if not sentence:
             # if sentence is empty or none just return the same.
+            if span_info:
+                return sentence, []
             return sentence
         
         # Use extract_keywords with span_info to get all matches and their positions
         keywords_with_span = self.extract_keywords(sentence, span_info=True, max_cost=max_cost)
         
         if not keywords_with_span:
+            if span_info:
+                return sentence, []
             return sentence
         
         # Build new sentence by replacing matched keywords
         new_sentence = []
         last_end = 0
+        replacements = []
         
         for keyword, start, end in keywords_with_span:
             # Add text before this keyword
             new_sentence.append(sentence[last_end:start])
             # Add the replacement keyword
             new_sentence.append(keyword)
+            
+            if span_info:
+                replacements.append({
+                    'original': sentence[start:end],
+                    'replacement': keyword,
+                    'start': start,
+                    'end': end
+                })
+            
             last_end = end
         
         # Add remaining text after last keyword
         new_sentence.append(sentence[last_end:])
         
-        return ''.join(new_sentence)
+        result_sentence = ''.join(new_sentence)
+        if span_info:
+            return result_sentence, replacements
+        return result_sentence
 
     def extract_sentences(self, text, delimiters=None):
         """
