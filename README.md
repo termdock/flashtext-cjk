@@ -3,6 +3,7 @@
 A maintained fork of [FlashText](https://github.com/vi3k6i5/flashtext) with internationalization and Unicode fixes.
 
 [![PyPI version](https://badge.fury.io/py/flashtext-i18n.svg)](https://badge.fury.io/py/flashtext-i18n)
+[![Python Versions](https://img.shields.io/pypi/pyversions/flashtext-i18n.svg)](https://pypi.org/project/flashtext-i18n/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Why This Fork?
@@ -84,9 +85,9 @@ FlashText uses the Aho-Corasick algorithm with O(n) time complexity, making it e
 
 See [Issues](https://github.com/termdock/flashtext-i18n/issues) for planned fixes:
 
-- [ ] Unicode case folding span fix (Turkish İ, German ß)
-- [ ] Keywords followed by numbers extraction
-- [ ] Internationalized word boundary detection
+- [x] Unicode case folding span fix (Turkish İ, German ß) (Fixed in v3.0.0)
+- [x] Keywords followed by numbers extraction (Fixed in v3.0.0)
+- [x] Internationalized word boundary detection (Fixed in v3.0.0)
 - [ ] Indian languages (Devanagari) support
 
 ## Credits
