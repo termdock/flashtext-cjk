@@ -15,7 +15,7 @@ The original FlashText is no longer actively maintained and has several bugs wit
 
 This fork aims to fix these issues while maintaining full API compatibility.
 
-## Fixed in v2.8.0
+## Fixed in v3.0.0
 
 ### CJK Adjacent Keywords
 
@@ -99,4 +99,4 @@ The original FlashText algorithm is described in the paper: [Replace or Retrieve
 
 MIT License - see [LICENSE](LICENSE) file.
 
-The original copyright belongs to Vikash Singh (2017). This fork is maintained by [termdock](https://github.com/termdock).
+The original copyright belongs to Vikash Singh (2017). This fork is maintained by [termdock](https://github.com/termdock) & Huang Chung Yi.

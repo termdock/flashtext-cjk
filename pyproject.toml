@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flashtext-i18n"
+version = "3.0.0"
+description = "Extract/Replace keywords in sentences. Fork with internationalization fixes for CJK and Unicode."
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "termdock & Huang Chung Yi", email = "cyh@hcytlog.com"}
+]
+maintainers = [
+    {name = "termdock & Huang Chung Yi", email = "cyh@hcytlog.com"}
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Natural Language :: Chinese (Simplified)",
+    "Natural Language :: Chinese (Traditional)",
+    "Natural Language :: Japanese",
+    "Natural Language :: Korean",
+    "Topic :: Text Processing :: Linguistic",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["flashtext", "keyword extraction", "keyword replacement", "NLP", "CJK", "i18n", "unicode"]
+
+[project.urls]
+Homepage = "https://github.com/termdock/flashtext-i18n"
+Repository = "https://github.com/termdock/flashtext-i18n.git"
+Issues = "https://github.com/termdock/flashtext-i18n/issues"
+Changelog = "https://github.com/termdock/flashtext-i18n/releases"
+
+[tool.setuptools.packages.find]
+include = ["flashtext*"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+python_files = ["test_*.py"]

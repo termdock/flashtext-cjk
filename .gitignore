@@ -109,3 +109,5 @@ how_to_test_setup_deploy.txt
 # Unit test / coverage reports
 .coverage
 .tox
+
+claude.md

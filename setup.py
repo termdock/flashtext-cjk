@@ -16,7 +16,7 @@ class PyTest(Command):
         raise SystemExit(errno)
 
 name = 'flashtext-i18n'
-version = '2.8.0'
+version = '3.0.0'
 
 cmdclass = {'test': PyTest}
 
@@ -30,13 +30,17 @@ setup(
     name=name,
     version=version,
     url='https://github.com/termdock/flashtext-i18n',
-    author='termdock',
-    author_email='termdock@users.noreply.github.com',
+    author='termdock & Huang Chung Yi',
+    author_email='cyh@hcytlog.com',
     description='Extract/Replace keywords in sentences. Fork with internationalization fixes.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     packages=['flashtext'],
     install_requires=[],
+    license='MIT',
+    license_files=['LICENSE'],
+    maintainer='termdock & Huang Chung Yi',
+    maintainer_email='cyh@hcytlog.com',
     platforms='any',
     cmdclass=cmdclass,
     classifiers=[
