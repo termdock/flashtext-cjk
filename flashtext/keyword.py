@@ -216,7 +216,10 @@ class KeywordProcessor(object):
             if self._keyword not in current_dict:
                 status = True
                 self._terms_in_trie += 1
-            current_dict[self._keyword] = clean_name
+            if isinstance(clean_name, list):
+                 current_dict[self._keyword] = list(clean_name)
+            else:
+                 current_dict[self._keyword] = clean_name
         return status
 
     def __delitem__(self, keyword):
@@ -636,7 +639,11 @@ class KeywordProcessor(object):
                             idx = sequence_end_pos
                     current_dict = self.keyword_trie_dict
                     if longest_sequence_found:
-                        keywords_extracted.append((longest_sequence_found, sequence_start_pos, idx))
+                        if isinstance(longest_sequence_found, list):
+                            for key in longest_sequence_found:
+                                keywords_extracted.append((key, sequence_start_pos, idx))
+                        else:
+                            keywords_extracted.append((longest_sequence_found, sequence_start_pos, idx))
                         curr_cost = max_cost
                     reset_current_dict = True
                 else:
@@ -675,7 +682,11 @@ class KeywordProcessor(object):
             if idx + 1 >= sentence_len:
                 if self._keyword in current_dict:
                     sequence_found = current_dict[self._keyword]
-                    keywords_extracted.append((sequence_found, sequence_start_pos, sentence_len))
+                    if isinstance(sequence_found, list):
+                        for key in sequence_found:
+                            keywords_extracted.append((key, sequence_start_pos, sentence_len))
+                    else:
+                        keywords_extracted.append((sequence_found, sequence_start_pos, sentence_len))
             idx += 1
             if reset_current_dict:
                 reset_current_dict = False
@@ -730,6 +741,9 @@ class KeywordProcessor(object):
         replacements = []
         
         for keyword, start, end in keywords_with_span:
+            if start < last_end:
+                 # Skip overlapping keywords (e.g. from multi-label matches)
+                 continue
             # Add text before this keyword
             new_sentence.append(sentence[last_end:start])
             # Add the replacement keyword
