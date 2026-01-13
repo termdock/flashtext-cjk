@@ -352,10 +352,25 @@ class KeywordProcessor(object):
             if not isinstance(keywords, list):
                 raise AttributeError("Value of key {} should be a list".format(clean_name))
 
-            for keyword in keywords:
-                self.add_keyword(keyword, clean_name)
 
+        for clean_name, keywords in keyword_dict.items():
+            if isinstance(keywords, list):
+                for keyword in keywords:
+                    self.add_keyword(keyword, clean_name)
+            else:
+                self.add_keyword(keywords, clean_name)
 
+    def add_keywords_from_list(self, keyword_list):
+        """
+        To add keywords from a list
+        Args:
+            keyword_list (list): List of keywords
+
+        Examples:
+            >>> keyword_processor.add_keywords_from_list(["NY", "New York"])
+        """
+        for keyword in keyword_list:
+            self.add_keyword(keyword)
 
     def remove_keywords_from_dict(self, keyword_dict):
         """To remove keywords from a dictionary
@@ -381,23 +396,7 @@ class KeywordProcessor(object):
             for keyword in keywords:
                 self.remove_keyword(keyword)
 
-    def add_keywords_from_list(self, keyword_list):
-        """To add keywords from a list
 
-        Args:
-            keyword_list (list(str)): List of keywords to add
-
-        Examples:
-            >>> keyword_processor.add_keywords_from_list(["java", "python"]})
-        Raises:
-            AttributeError: If `keyword_list` is not a list.
-
-        """
-        if not isinstance(keyword_list, list):
-            raise AttributeError("keyword_list should be a list")
-
-        for keyword in keyword_list:
-            self.add_keyword(keyword)
 
     def remove_keywords_from_list(self, keyword_list):
         """To remove keywords present in list
@@ -406,7 +405,7 @@ class KeywordProcessor(object):
             keyword_list (list(str)): List of keywords to remove
 
         Examples:
-            >>> keyword_processor.remove_keywords_from_list(["java", "python"]})
+            >>> keyword_processor.remove_keywords_from_list(["java", "python"])
         Raises:
             AttributeError: If `keyword_list` is not a list.
 
@@ -741,31 +740,8 @@ class KeywordProcessor(object):
         return next_word
 
     def levensthein(self, word, max_cost=2, start_node=None):
-        """
-        Retrieve the nodes where there is a fuzzy match,
-        via levenshtein distance, and with respect to max_cost
-
-        Args:
-            word (str): word to find a fuzzy match for
-            max_cost (int): maximum levenshtein distance when performing the fuzzy match
-            start_node (dict): Trie node from which the search is performed
-
-        Yields:
-            node, cost, depth (tuple): A tuple containing the final node,
-                                      the cost (i.e the distance), and the depth in the trie
-
-        Examples:
-            >>> from flashtext import KeywordProcessor
-            >>> keyword_processor = KeywordProcessor(case_sensitive=True)
-            >>> keyword_processor.add_keyword('Marie', 'Mary')
-            >>> next(keyword_processor.levensthein('Maria', max_cost=1))
-            >>> ({'_keyword_': 'Mary'}, 1, 5)
-            ...
-            >>> keyword_processor = KeywordProcessor(case_sensitive=True
-            >>> keyword_processor.add_keyword('Marie Blanc', 'Mary')
-            >>> next(keyword_processor.levensthein('Mari', max_cost=1))
-            >>> ({' ': {'B': {'l': {'a': {'n': {'c': {'_keyword_': 'Mary'}}}}}}}, 1, 5)
-        """
         start_node = start_node or self.keyword_trie_dict
         yield from levensthein(word, max_cost, start_node, self._white_space_chars, self._keyword)
+
+
 

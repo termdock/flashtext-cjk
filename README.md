@@ -1,5 +1,7 @@
 # FlashText i18n
 
+[English](README.md) | [繁體中文](README_zh-TW.md)
+
 A maintained fork of [FlashText](https://github.com/vi3k6i5/flashtext) with internationalization and Unicode fixes.
 
 [![PyPI version](https://badge.fury.io/py/flashtext-i18n.svg)](https://badge.fury.io/py/flashtext-i18n)
@@ -16,13 +18,34 @@ The original FlashText is no longer actively maintained and has several bugs wit
 
 This fork aims to fix these issues while maintaining full API compatibility.
 
-## Fixed in v3.0.0
+## Version History
 
-### International Word Boundaries (New in v3.1.0-dev)
+### v4.0.0 (Rust Core) - *Alpha Released*
+
+**Performance**
+- **Rust Core**: Massive throughput improvement (~3-4x faster than Python).
+- **Scalability**: Near-constant match time even with 100k+ keywords.
+- **Compatibility**: 100% Drop-in replacement for Python API.
+
+**New Features**
+- **International Word Boundaries**: Unicode-aware boundary detection.
+- **Load Keywords from File**: Support for JSON/Text files.
+- **Mixed Case Support**: Case-sensitive and Case-insensitive coexistence.
+- **Fuzzy Matching**: Optional Levenshtein support.
+- **New APIs**: Extract sentences, replacement metadata.
+
+### v3.0.0 (Python Core) - *Released*
+- **Unicode case folding**: Correct spans for Turkish `İ` and German `ß`
+- **Numbers**: Keywords followed by numbers are now extracted correctly
+- **CJK Support**: Adjacent keywords (Chinese/Japanese) now extracted correctly
+
+## Feature Highlights
+
+### International Word Boundaries (v4.0)
 
 The original FlashText only supported ASCII characters (`A-Za-z0-9_`) as word parts. This caused issues for many languages where characters like `é`, `ß`, or `ç` were treated as delimiters, breaking words apart.
 
-**Fixed in v3.1.0**: All valid Unicode alphanumeric characters are now treated as part of a word by default.
+**v4.0 Fix**: All valid Unicode alphanumeric characters are now treated as part of a word by default.
 
 ```python
 # Hindi (Devanagari)
@@ -36,7 +59,7 @@ kp.extract_keywords('I went to a café.')
 # ✅ ['café'] (Previously extracted 'caf')
 ```
 
-### CJK Adjacent Keywords
+### CJK Adjacent Keywords (v3.0)
 
 ```python
 from flashtext import KeywordProcessor
@@ -49,7 +72,9 @@ text = '推薦雅詩蘭黛小棕瓶超好用'
 result = kp.extract_keywords(text)
 # Original FlashText: ['雅詩蘭黛']  ❌ Missing '小棕瓶'
 # FlashText i18n:     ['雅詩蘭黛', '小棕瓶']  ✅ Both extracted!
-### Loading Keywords from File (New in v3.1.0-dev)
+```
+
+### Loading Keywords from File (v4.0)
 
 You can now load keywords directly from JSON or text files.
 
@@ -60,7 +85,7 @@ You can now load keywords directly from JSON or text files.
 #    "Vehicle": ["car", "bike"]
 # }
 
-kp.add_keyword_from_file('keywords.json')
+kp.add_keywords_from_file('keywords.json')
 ```
 
 ## Installation
@@ -68,6 +93,13 @@ kp.add_keyword_from_file('keywords.json')
 ```bash
 pip install flashtext-i18n
 ```
+
+> **Note**: This package provides a drop-in replacement module named `flashtext`. Please **uninstall** the original `flashtext` package first to avoid conflicts.
+> ```bash
+> pip uninstall -y flashtext
+> pip uninstall -y flashtext-i18n # optional cleanup
+> pip install -U flashtext-i18n
+> ```
 
 Or using [uv](https://github.com/astral-sh/uv):
 
@@ -108,7 +140,7 @@ keywords_with_span = kp.extract_keywords(text, span_info=True)
 new_text = kp.replace_keywords(text)
 # 'I love Python and Machine Learning'
 
-# Get replacement details (New in v3.1.0)
+# Get replacement details (New in v4.0)
 new_text, replacements = kp.replace_keywords(text, span_info=True)
 # replacements = [
 #     {'original': 'Python', 'replacement': 'Python', 'start': 7, 'end': 13},
@@ -116,7 +148,7 @@ new_text, replacements = kp.replace_keywords(text, span_info=True)
 # ]
 
 
-# Extract sentences with keywords (New in v3.1.0)
+# Extract sentences with keywords (New in v4.0)
 sentences = kp.extract_sentences(text)
 # [('I love Python and 機器學習', ['Python', 'Machine Learning'])]
 
@@ -124,12 +156,12 @@ sentences = kp.extract_sentences(text)
 print(len(kp))
 # 2
 
-# One keyword matching multiple Tags (New in v3.1.0)
+# One keyword matching multiple Tags (New in v4.0)
 kp.add_keyword('Apple', ['Fruit', 'Tech'])
 keywords = kp.extract_keywords('I have an Apple')
 # ['Fruit', 'Tech']
 
-# Mixed Case Support (Case-Sensitive & Case-Insensitive) (New in v3.1.0)
+# Mixed Case Support (Case-Sensitive & Case-Insensitive) (New in v4.0)
 # Default: case_sensitive=False (Global)
 kp = KeywordProcessor()
 
@@ -144,13 +176,16 @@ keywords_found = kp.extract_keywords('I like Apple and Banana.')
 
 keywords_found = kp.extract_keywords('I like apple and BANANA.')
 # ['banana'] (Strict 'Apple' does not match 'apple')
-```
 
-> **Note:** For high performance, FlashText merges case-insensitive paths in the internal Trie. If a case-insensitive keyword overlaps with a case-sensitive keyword (e.g. Loose `us` vs Strict `US`), they share the same path. The last added keyword will determine the replacement value for shared matches.
+> **Note**: **Shared Trie Path Tradeoff**. If you add `Apple` (Case-Sensitive) and `apple` (Insensitive), they share the path a-p-p-l-e. The last definition wins. **Recommendation**: Add case-sensitive keywords *after* case-insensitive ones if strict separation is needed.
 
 ### Fuzzy Matching (Levenshtein Distance)
 
-FlashText supports fuzzy matching to handle typos in input text. Use `max_cost` to specify the maximum allowable Levenshtein distance.
+FlashText supports fuzzy matching to handle typos.
+
+> **Warning**: Fuzzy matching introduces additional Levenshtein distance calculation overhead, making it **significantly slower** than exact matching. Use only when necessary.
+
+Use `max_cost` to specify the maximum allowable Levenshtein distance.
 
 ```python
 kp = KeywordProcessor()
@@ -164,25 +199,49 @@ kp.extract_keywords('I love Machine Learning')
 kp.extract_keywords('I love Mchine Larning', max_cost=2)
 # ['Machine Learning']
 
-# Fuzzy match for CJK (New in v3.1.0)
+# Fuzzy match for CJK (New in v4.0)
 kp.add_keyword('人工智慧')
 # Matches "人工智障" (1 substitution)
 kp.extract_keywords('這有人工智障功能', max_cost=1)
 # ['人工智慧']
 ```
 
-## Performance
+## Performance (v4.0 Rust Core)
 
-FlashText uses the Aho-Corasick algorithm with O(n) time complexity, making it extremely fast.
-In v3.1.0, we introduced a **Trie-based optimization** for mixed-case support, eliminating runtime overhead for case-insensitive matching.
+Comparison of **FlashText 4.0 (Rust)**, **FlashText 3.0 (Python)**, and **Regex (compiled)**.
 
-| Benchmark (1000 keywords, 3.7M chars) | Time |
-|-----------|-----------|
-| **FlashText (Case-Sensitive)** | **0.27s** |
-| **FlashText (Case-Insensitive)** | **0.29s** |
-| Regex (Compiled) | ~2.5s+ |
+### Benchmark Methodology
 
-(Tested on Apple Silicon)
+- **Corpus**: 10,000 lines (Short sentences, simulated natural language).
+- **Terms**: 1,000 to 100,000 unique keywords.
+- **Metric**: Median Match Time (Seconds) over 10 iterations (Warmup enabled).
+- **Environment**: Apple Silicon (M1/M2/M3), Python 3.11.
+
+### Results: Keyword Extraction Time (Lower is Better)
+
+| Keywords | Rust (v4.0) | Python (v3.0) | Regex | Speedup (vs Py) | Speedup (vs Re) |
+|---------:|------------:|--------------:|------:|----------------:|----------------:|
+| 1,000    | **0.012s**  | 0.043s        | 0.92s | **3.6x**        | 76x             |
+| 5,000    | **0.013s**  | 0.042s        | 4.80s | **3.2x**        | 369x            |
+| 20,000   | **0.018s**  | 0.046s        | 19.16s| **2.6x**        | **1064x**       |
+| 100,000  | **0.021s**  | 0.056s        | N/A   | **2.7x**        | N/A             |
+
+> **Note**: Rust match latency remains **nearly constant** as keyword count scales from 1k to 100k (on this corpus). Regex performance degrades sharply as the number of alternations grows, making it unsuitable for large keyword sets. Rust reduces per-character overhead and memory allocations, resulting in a consistent **2.6x to 3.6x** speedup over the Python implementation.
+
+![Match Time Benchmark](docs/img/match_time_short_low.png)
+*(Figure 1: Comparison vs Regex - Rust is 1000x faster)*
+
+![Match Time Rust vs Python](docs/img/match_time_short_low_no_regex.png)
+*(Figure 2: Comparison vs Python - Rust is ~3x faster and scales better)*
+
+### Build Time (Index Construction)
+
+| Keywords | Rust (v4.0) | Python (v3.0) |
+|---------:|------------:|--------------:|
+| 100,000  | **0.08s**   | 0.17s         |
+
+Rust constructs the keyword trie index 2x faster than Python.
+*(Build time measured on the same machine, release build, 10 iterations)*
 
 ## Roadmap
 
@@ -190,9 +249,9 @@ See [Issues](https://github.com/termdock/flashtext-i18n/issues) for planned fixe
 
 - [x] Unicode case folding span fix (Turkish İ, German ß) (Fixed in v3.0.0)
 - [x] Keywords followed by numbers extraction (Fixed in v3.0.0)
-- [x] Internationalized word boundary detection (Fixed in v3.1.0)
-- [x] Indian languages (Devanagari) support (Fixed in v3.1.0)
-- [x] Load keywords from JSON/Text file (Fixed in v3.1.0)
+- [x] Internationalized word boundary detection (Fixed in v4.0)
+- [x] Indian languages (Devanagari) support (Fixed in v4.0)
+- [x] Load keywords from JSON/Text file (Fixed in v4.0)
 
 ## Credits
 

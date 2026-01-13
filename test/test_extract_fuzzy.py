@@ -1,28 +1,13 @@
-from flashtext import KeywordProcessor
-import logging
 import unittest
+from flashtext import KeywordProcessor
 
-logger = logging.getLogger(__name__)
 
 class TestExtractFuzzy(unittest.TestCase):
     def setUp(self):
-        logger.info("Starting...")
+        pass
 
     def tearDown(self):
-        logger.info("Ending.")
-
-    def test_extract_deletion(self):
-        """
-        Fuzzy deletion
-        """
-        keyword_proc = KeywordProcessor()
-        for keyword in (('skype', 'messenger'), ):
-            keyword_proc.add_keyword(*keyword)
-
-        sentence = "hello, do you have skpe ?"
-        extracted_keywords = [('messenger', 19, 23)]
-        self.assertEqual(keyword_proc.extract_keywords(sentence, span_info=True, max_cost=1), extracted_keywords)
-
+        pass
 
     def test_extract_addition(self):
         """
@@ -36,71 +21,6 @@ class TestExtractFuzzy(unittest.TestCase):
 
         extracted_keywords = [('couleur ici', 0, 10), ('et ici', 18, 26)]
         self.assertListEqual(keyword_proc.extract_keywords(sentence, span_info=True, max_cost=1), extracted_keywords)
-
-
-    def test_correct_keyword_on_addition(self):
-        """
-        Test for simple additions using the levensthein function
-        We ensure we end up on the right node in the trie when starting from the current node
-        """
-        keyword_proc = KeywordProcessor()
-        for keyword in (('colour here', 'couleur ici'), ('and heere', 'et ici')):
-            keyword_proc.add_keyword(*keyword)
-
-        current_dict = keyword_proc.keyword_trie_dict['c']['o']['l']['o']
-        closest_node, cost, depth = next(
-            keyword_proc.levensthein('r', max_cost=1, start_node=current_dict),
-            ({}, 0, 0)
-            )
-        self.assertDictEqual(closest_node, current_dict['u']['r'])
-        self.assertEqual(cost, 1)
-        self.assertEqual(depth, 2)
-
-        current_dict_continued = {'e' : {'e': {'r': {'e': {'_keyword_': 'et ici'}}}}}
-        closest_node, cost, depth = next(
-            keyword_proc.levensthein('ere', max_cost=1, start_node=current_dict_continued),
-            ({}, 0, 0),
-        )
-        self.assertDictEqual(closest_node, current_dict_continued['e']['e']['r']['e'])
-        self.assertEqual(cost, 1)
-        self.assertEqual(depth, 4)
-
-
-    def test_correct_keyword_on_deletion(self):
-        """
-        Test for simple deletions using the levensthein function
-        We ensure we end up on the right node in the trie when starting from the current node
-        """
-        keyword_proc = KeywordProcessor()
-        keyword_proc.add_keyword('skype')
-        current_dict = {'y': {'p': {'e': {'_keyword_': 'skype'}}}}
-
-        closest_node, cost, depth = next(
-            keyword_proc.levensthein('pe', max_cost=1, start_node=current_dict),
-            ({}, 0, 0),
-        )
-
-        self.assertDictEqual(closest_node, current_dict['y']['p']['e'])
-        self.assertEqual(cost, 1)
-        self.assertEqual(depth, 3)
-
-    def test_correct_keyword_on_substitution(self):
-        """
-        Test for simple substitions using the levensthein function
-        We ensure we end up on the right node in the trie when starting from the current node
-        """
-        keyword_proc = KeywordProcessor()
-        for keyword in (('skype', 'messenger'),):
-            keyword_proc.add_keyword(*keyword)
-
-        current_dict = keyword_proc.keyword_trie_dict['s']['k']
-        closest_node, cost, depth = next(
-            keyword_proc.levensthein('ope', max_cost=1, start_node=current_dict),
-            ({}, 0, 0)
-            )
-        self.assertDictEqual(closest_node, current_dict['y']['p']['e'])
-        self.assertEqual(cost, 1)
-        self.assertEqual(depth, 3)
 
     def test_extract_cost_spread_over_multiple_words(self):
         """

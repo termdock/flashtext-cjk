@@ -1,0 +1,299 @@
+[
+  {
+    "engine": "Rust",
+    "terms": 1000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.000487750003230758,
+    "p95": 0.0005766733971540816,
+    "count": 0
+  },
+  {
+    "engine": "Python",
+    "terms": 1000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.001141000000643544,
+    "p95": 0.0014934126680600456,
+    "count": 0
+  },
+  {
+    "engine": "Regex",
+    "terms": 1000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.0002252080012112856,
+    "p95": 0.00023176107497420163,
+    "count": 0
+  },
+  {
+    "engine": "Rust",
+    "terms": 1000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 0.011867458510096185,
+    "p95": 0.012191142006486189,
+    "count": 3
+  },
+  {
+    "engine": "Python",
+    "terms": 1000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 0.04290068749105558,
+    "p95": 0.04730620972550241,
+    "count": 3
+  },
+  {
+    "engine": "Regex",
+    "terms": 1000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 0.9188474789843895,
+    "p95": 1.4994939078285825,
+    "count": 3
+  },
+  {
+    "engine": "Rust",
+    "terms": 1000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 0.012065770497429185,
+    "p95": 0.01310136087849969,
+    "count": 152
+  },
+  {
+    "engine": "Python",
+    "terms": 1000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 0.0386868749774294,
+    "p95": 0.0388963032150059,
+    "count": 152
+  },
+  {
+    "engine": "Regex",
+    "terms": 1000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 0.8569803334976314,
+    "p95": 0.8754655828786782,
+    "count": 152
+  },
+  {
+    "engine": "Rust",
+    "terms": 5000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.0030438125104410574,
+    "p95": 0.0032032454924774355,
+    "count": 0
+  },
+  {
+    "engine": "Python",
+    "terms": 5000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.006414125004084781,
+    "p95": 0.006840478217054624,
+    "count": 0
+  },
+  {
+    "engine": "Regex",
+    "terms": 5000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.0011742704955395311,
+    "p95": 0.0012952325458172708,
+    "count": 0
+  },
+  {
+    "engine": "Rust",
+    "terms": 5000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 0.01426083299156744,
+    "p95": 0.01500456380599644,
+    "count": 17
+  },
+  {
+    "engine": "Python",
+    "terms": 5000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 0.04232033349398989,
+    "p95": 0.04463620148017071,
+    "count": 17
+  },
+  {
+    "engine": "Regex",
+    "terms": 5000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 4.628802416511462,
+    "p95": 5.212790225008211,
+    "count": 17
+  },
+  {
+    "engine": "Rust",
+    "terms": 5000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 0.012632166486582719,
+    "p95": 0.013096258182486054,
+    "count": 758
+  },
+  {
+    "engine": "Python",
+    "terms": 5000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 0.04133952049596701,
+    "p95": 0.04486243446590379,
+    "count": 758
+  },
+  {
+    "engine": "Regex",
+    "terms": 5000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 4.249415583501104,
+    "p95": 4.547189721500035,
+    "count": 758
+  },
+  {
+    "engine": "Rust",
+    "terms": 20000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.013485562507412396,
+    "p95": 0.020332720382430124,
+    "count": 0
+  },
+  {
+    "engine": "Python",
+    "terms": 20000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.03328527099802159,
+    "p95": 0.03431054215616314,
+    "count": 0
+  },
+  {
+    "engine": "Regex",
+    "terms": 20000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.00462699998752214,
+    "p95": 0.004764248528226744,
+    "count": 0
+  },
+  {
+    "engine": "Rust",
+    "terms": 20000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 0.017301874991972,
+    "p95": 0.019740463775815443,
+    "count": 82
+  },
+  {
+    "engine": "Python",
+    "terms": 20000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 0.045990791491931304,
+    "p95": 0.04828024231537711,
+    "count": 82
+  },
+  {
+    "engine": "Regex",
+    "terms": 20000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 18.632258395999088,
+    "p95": 19.318585059483304,
+    "count": 82
+  },
+  {
+    "engine": "Rust",
+    "terms": 20000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 0.021079270998598076,
+    "p95": 0.02213868893450126,
+    "count": 3034
+  },
+  {
+    "engine": "Python",
+    "terms": 20000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 0.050274770517717116,
+    "p95": 0.059336468594847244,
+    "count": 3034
+  },
+  {
+    "engine": "Regex",
+    "terms": 20000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 17.26264122899738,
+    "p95": 17.901508672122144,
+    "count": 3034
+  },
+  {
+    "engine": "Rust",
+    "terms": 100000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.08191441700910218,
+    "p95": 0.09073911103623686,
+    "count": 0
+  },
+  {
+    "engine": "Python",
+    "terms": 100000,
+    "metric": "Build",
+    "corpus": null,
+    "median": 0.17717418701795395,
+    "p95": 0.20844132018391975,
+    "count": 0
+  },
+  {
+    "engine": "Rust",
+    "terms": 100000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 0.01924739551031962,
+    "p95": 0.021996929969463962,
+    "count": 420
+  },
+  {
+    "engine": "Python",
+    "terms": 100000,
+    "metric": "Match",
+    "corpus": "short_low",
+    "median": 0.055847937503131106,
+    "p95": 0.06351550013496307,
+    "count": 420
+  },
+  {
+    "engine": "Rust",
+    "terms": 100000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 0.03013195849780459,
+    "p95": 0.03745003401563736,
+    "count": 15766
+  },
+  {
+    "engine": "Python",
+    "terms": 100000,
+    "metric": "Match",
+    "corpus": "short_high",
+    "median": 0.06537072951323353,
+    "p95": 0.07280671541084302,
+    "count": 15766
+  }
+]

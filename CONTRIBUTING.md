@@ -26,3 +26,37 @@ Ensure all unit tests pass:
 ```bash
 python3 -m pytest
 ```
+
+## Release SOP
+
+This project uses `maturin` and GitHub Actions for automated releases.
+
+### 1. Prerequisites
+- Ensure you have write access to the repository.
+- Ensure PyPI Trusted Publishing is configured for this repo.
+
+### 2. Verification
+Before releasing, always verify the package locally:
+```bash
+./verify_package.sh
+```
+If this passes (🎉 Package verification PASSED!), you are safe to proceed.
+
+### 3. TestPyPI Release (Optional but Recommended)
+To test the packaging process without affecting production:
+1. Go to **Actions** tab -> **build-and-publish** workflow.
+2. Click **Run workflow** -> Select branch (e.g. `main`) -> Click **Run workflow**.
+3. This triggers the `publish-testpypi` job.
+4. Verify by installing:
+   ```bash
+   pip install --index-url https://test.pypi.org/simple/ --no-deps flashtext-i18n
+   ```
+
+### 4. Production Release
+1. Update version in `pyproject.toml`.
+2. Create and push a tag starting with `v`:
+   ```bash
+   git tag v4.0.0
+   git push origin v4.0.0
+   ```
+3. This triggers the `publish-pypi` job automatically.

@@ -110,4 +110,5 @@ how_to_test_setup_deploy.txt
 .coverage
 .tox
 
-claude.md
+claude.mdbenchmarks/data/
+.venv_verify/*

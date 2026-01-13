@@ -56,8 +56,8 @@ class TestKeywordRemover(unittest.TestCase):
             keyword_processor = KeywordProcessor()
             keyword_processor.add_keywords_from_dict(test_case['keyword_dict'])
             keyword_processor.remove_keywords_from_dict(test_case['remove_keyword_dict'])
-            keyword_trie_dict = keyword_processor.keyword_trie_dict
-
+            
+            # Rebuild expected state
             new_dictionary = defaultdict(list)
             for key, values in test_case['keyword_dict'].items():
                 for value in values:
@@ -67,12 +67,12 @@ class TestKeywordRemover(unittest.TestCase):
             keyword_processor_two = KeywordProcessor()
             keyword_processor_two.add_keywords_from_dict(new_dictionary)
             
-            # Use get_all_keywords() to verify content equality instead of internal Trie structure
-            # (which differs due to DAG optimization and is hard to compare strictly)
+            # Use get_all_keywords() to verify content equality
             kp1_keywords = keyword_processor.get_all_keywords()
             kp2_keywords = keyword_processor_two.get_all_keywords()
             
             self.assertEqual(kp1_keywords, kp2_keywords,
-                            "keywords_extracted don't match the expected results for test case: {}".format(test_id))
+                            "KeywordProcessor states don't match for test case: {}".format(test_id))
+
 if __name__ == '__main__':
     unittest.main()

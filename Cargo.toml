@@ -1,0 +1,14 @@
+[package]
+name = "flashtext-i18n-rs"
+version = "0.4.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "flashtext_rs"
+crate-type = ["cdylib"]
+path = "rust_src/lib.rs"
+
+[dependencies]
+pyo3 = { version = "0.23.0", features = ["extension-module"] }
