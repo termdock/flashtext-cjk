@@ -8,6 +8,9 @@ import re
 
 
 
+from .trie_dict import add_keyword_to_trie, remove_keyword_from_trie, get_all_keywords
+
+
 class KeywordProcessor(object):
     """KeywordProcessor
 
@@ -149,45 +152,12 @@ class KeywordProcessor(object):
         If case_sensitive is None, uses self.case_sensitive.
         If case_sensitive is False, adds edges for both lower and upper case chars.
         """
-        status = False
-        if not clean_name and keyword:
-            clean_name = keyword
-
-        if keyword and clean_name:
-            if case_sensitive is None:
-                case_sensitive = self.case_sensitive
+        if case_sensitive is None:
+            case_sensitive = self.case_sensitive
             
-            # If case sensitive, we only add the exact path.
-            # If not case sensitive, we add paths for both cases sharing the same nodes.
-            
-            current_dict = self.keyword_trie_dict
-            for char in keyword:
-                if case_sensitive:
-                    current_dict = current_dict.setdefault(char, {})
-                else:
-                    # Loose case: ensure we have a node for this step
-                    lower = char.lower()
-                    upper = char.upper()
-                    
-                    # Try to find existing node (shared)
-                    next_node = current_dict.get(lower) or current_dict.get(upper)
-                    if next_node is None:
-                        next_node = {}
-                    
-                    # Link both lower and upper to this node
-                    current_dict[lower] = next_node
-                    current_dict[upper] = next_node
-                    
-                    current_dict = next_node
-            
-            if self._keyword not in current_dict:
-                status = True
-                self._terms_in_trie += 1
-            
-            if isinstance(clean_name, list):
-                 current_dict[self._keyword] = list(clean_name)
-            else:
-                 current_dict[self._keyword] = clean_name
+        status = add_keyword_to_trie(self.keyword_trie_dict, keyword, clean_name, case_sensitive, self._keyword)
+        if status:
+            self._terms_in_trie += 1
         return status
 
     def __delitem__(self, keyword):
@@ -202,56 +172,9 @@ class KeywordProcessor(object):
             >>> keyword_processor.add_keyword('Big Apple')
             >>> del keyword_processor['Big Apple']
         """
-        status = False
-        if keyword:
-            # Note: We do NOT lower the keyword even if case_sensitive is False.
-            # Because the Trie now contains edges for both cases.
-            current_dict = self.keyword_trie_dict
-            character_trie_list = []
-            for letter in keyword:
-                if letter in current_dict:
-                    character_trie_list.append((letter, current_dict))
-                    current_dict = current_dict[letter] # This is safe
-                else:
-                    # if character is not found, break out of the loop
-                    current_dict = None
-                    break
-            # remove the characters from trie dict if there are no other keywords with them
-            if current_dict and self._keyword in current_dict:
-                # we found a complete match for input keyword.
-                character_trie_list.append((self._keyword, current_dict))
-                character_trie_list.reverse()
-
-                for key_to_remove, dict_pointer in character_trie_list:
-                    if len(dict_pointer.keys()) == 1:
-                        dict_pointer.pop(key_to_remove)
-                    else:
-                        # more than one key means more than 1 path.
-                        # Delete not required path and keep the other
-                        
-                        # Check for multi-edge (mixed case) redundancy
-                        # If we are removing 'a', check if 'A' points to the same object
-                        if isinstance(key_to_remove, str): # Verify it's not _keyword_
-                            lower = key_to_remove.lower()
-                            upper = key_to_remove.upper()
-                            other_key = upper if key_to_remove == lower else lower
-                            
-                            if other_key != key_to_remove and other_key in dict_pointer and key_to_remove in dict_pointer:
-                                if dict_pointer[other_key] is dict_pointer[key_to_remove]:
-                                    dict_pointer.pop(other_key)
-
-                        dict_pointer.pop(key_to_remove)
-                        # After popping, check if dict became empty? 
-                        # If so, we should continue loop? 
-                        # Original logic breaks here. 
-                        # If we popped both edges, and dict is now empty (except maybe other keys?), 
-                        # we might want to continue bubbling up if it IS empty.
-                        if len(dict_pointer) == 0:
-                             continue # Continue bubbling up
-                        break
-                # successfully removed keyword
-                status = True
-                self._terms_in_trie -= 1
+        status = remove_keyword_from_trie(self.keyword_trie_dict, keyword, self._keyword)
+        if status:
+            self._terms_in_trie -= 1
         return status
 
     def __iter__(self):
@@ -516,39 +439,7 @@ class KeywordProcessor(object):
             >>> {'j2ee': 'Java', 'python': 'Python'}
             >>> # NOTE: for case_insensitive all keys will be lowercased.
         """
-        terms_present = {}
-        if not term_so_far:
-            term_so_far = ''
-        if current_dict is None:
-            current_dict = self.keyword_trie_dict
-        if current_dict is None:
-            current_dict = self.keyword_trie_dict
-        
-        # Optimization: group keys pointing to the same child node object
-        # to avoid exponential traversal in Mixed Case Support (DAG Trie)
-        visited_children = {} # id(child_node) -> child_node
-        keys_for_child = {}   # id(child_node) -> set(keys) OR representative_key
-        
-        for key in current_dict:
-            if key == '_keyword_':
-                terms_present[term_so_far] = current_dict[key]
-            else:
-                child_node = current_dict[key]
-                child_id = id(child_node)
-                if child_id not in visited_children:
-                    visited_children[child_id] = child_node
-                    keys_for_child[child_id] = key # Pick first key as representative
-                # Else: we skip traversing this child again for other keys (e.g. 'A' vs 'a')
-        
-        for child_id, child_node in visited_children.items():
-            representative_key = keys_for_child[child_id]
-            # Use representative key to recurse. 
-            # Note: This means we only return one variation (e.g. 'apple' but not 'Apple')
-            # if they share the path. This mimics legacy case-insensitive behavior where keys were lowercased.
-            sub_values = self.get_all_keywords(term_so_far + representative_key, child_node)
-            for key in sub_values:
-                terms_present[key] = sub_values[key]
-        return terms_present
+        return get_all_keywords(self.keyword_trie_dict, term_so_far, current_dict, self._keyword)
 
     def extract_keywords(self, sentence, span_info=False, max_cost=0):
         """Searches in the string for all keywords present in corpus.
