@@ -15,7 +15,7 @@ class PyTest(Command):
         errno = subprocess.call(['py.test'])
         raise SystemExit(errno)
 
-name = 'flashtext-cjk'
+name = 'flashtext-i18n'
 version = '2.8.0'
 
 cmdclass = {'test': PyTest}
@@ -29,10 +29,10 @@ except ImportError:
 setup(
     name=name,
     version=version,
-    url='https://github.com/termdock/flashtext-cjk',
+    url='https://github.com/termdock/flashtext-i18n',
     author='termdock',
     author_email='termdock@users.noreply.github.com',
-    description='Extract/Replace keywords in sentences. Fork with CJK language fixes.',
+    description='Extract/Replace keywords in sentences. Fork with internationalization fixes.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     packages=['flashtext'],

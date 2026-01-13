@@ -1,15 +1,23 @@
-# FlashText CJK
+# FlashText i18n
 
-A fork of [FlashText](https://github.com/vi3k6i5/flashtext) with fixes for CJK (Chinese, Japanese, Korean) language support.
+A maintained fork of [FlashText](https://github.com/vi3k6i5/flashtext) with internationalization and Unicode fixes.
 
-[![PyPI version](https://badge.fury.io/py/flashtext-cjk.svg)](https://badge.fury.io/py/flashtext-cjk)
+[![PyPI version](https://badge.fury.io/py/flashtext-i18n.svg)](https://badge.fury.io/py/flashtext-i18n)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Why This Fork?
 
-The original FlashText has a bug where **adjacent keywords in CJK text are not properly extracted**. This is because CJK languages don't use spaces as word boundaries.
+The original FlashText is no longer actively maintained and has several bugs with international text:
 
-### The Problem
+- **CJK languages**: Adjacent keywords not extracted (Chinese, Japanese, Korean)
+- **Unicode case folding**: Wrong span positions for characters like Turkish `İ`
+- **Non-ASCII boundaries**: Various edge cases with international characters
+
+This fork aims to fix these issues while maintaining full API compatibility.
+
+## Fixed in v2.8.0
+
+### CJK Adjacent Keywords
 
 ```python
 from flashtext import KeywordProcessor
@@ -21,32 +29,19 @@ kp.add_keyword('小棕瓶')    # Advanced Night Repair
 text = '推薦雅詩蘭黛小棕瓶超好用'
 result = kp.extract_keywords(text)
 # Original FlashText: ['雅詩蘭黛']  ❌ Missing '小棕瓶'
-```
-
-### The Fix
-
-```python
-from flashtext import KeywordProcessor
-
-kp = KeywordProcessor()
-kp.add_keyword('雅詩蘭黛')
-kp.add_keyword('小棕瓶')
-
-text = '推薦雅詩蘭黛小棕瓶超好用'
-result = kp.extract_keywords(text)
-# FlashText CJK: ['雅詩蘭黛', '小棕瓶']  ✅ Both extracted!
+# FlashText i18n:     ['雅詩蘭黛', '小棕瓶']  ✅ Both extracted!
 ```
 
 ## Installation
 
 ```bash
-pip install flashtext-cjk
+pip install flashtext-i18n
 ```
 
 Or install from GitHub:
 
 ```bash
-pip install git+https://github.com/termdock/flashtext-cjk.git
+pip install git+https://github.com/termdock/flashtext-i18n.git
 ```
 
 ## Usage
@@ -85,11 +80,14 @@ FlashText uses the Aho-Corasick algorithm with O(n) time complexity, making it e
 |-----------|-----------|-------|
 | 1000 keywords, 1M chars | ~0.1s | ~10s+ |
 
-## Changes from Original
+## Roadmap
 
-- **Fixed**: Adjacent keyword extraction in CJK languages
-- **Maintained**: Full API compatibility
-- **Maintained**: All original features (fuzzy matching, etc.)
+See [Issues](https://github.com/termdock/flashtext-i18n/issues) for planned fixes:
+
+- [ ] Unicode case folding span fix (Turkish İ, German ß)
+- [ ] Keywords followed by numbers extraction
+- [ ] Internationalized word boundary detection
+- [ ] Indian languages (Devanagari) support
 
 ## Credits
 
