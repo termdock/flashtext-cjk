@@ -7,7 +7,7 @@ name = "flashtext-i18n"
 version = "3.0.0"
 description = "Extract/Replace keywords in sentences. Fork with internationalization fixes for CJK and Unicode."
 readme = "README.md"
-license = "MIT"
+license = { text = "MIT" }
 authors = [
     {name = "termdock & Huang Chung Yi", email = "cyh@hcytlog.com"}
 ]
