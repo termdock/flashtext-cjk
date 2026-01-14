@@ -22,10 +22,12 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
+          zig: true
           manylinux: auto
           args: --release --out dist
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
+          RUSTFLAGS: "-C target-cpu=x86-64"
       - name: Verify wheel
         run: |
           ls -la dist/
@@ -50,6 +52,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
+          zig: true
           manylinux: auto
           args: --release --out dist
         env:

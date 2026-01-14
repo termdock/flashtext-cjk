@@ -53,3 +53,8 @@ All notable changes to this project will be documented in this file.
 - Added `CONTRIBUTING.md` with strict performance guidelines.
 - Added `benchmark.py` for standardized performance testing.
 - Updated `README.md` with new features and benchmark results.
+
+## v4.0.0a11 (2026-01-14)
+
+### Fixed
+- **Deployment Crash**: Fixed `Illegal Instruction` (BackOff restart) on Zeabur/generic Linux environments by enforcing generic x86-64 CPU target and enabling Zig cross-compilation for older glibc compatibility (`manylinux2014`).
