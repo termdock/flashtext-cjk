@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "flashtext-i18n"
-version = "4.0.0-alpha"
+version = "4.0.0a1"
 description = "Extract/Replace keywords in sentences. Fork with internationalization fixes for CJK and Unicode."
 readme = "README.md"
 license = { text = "MIT" }
