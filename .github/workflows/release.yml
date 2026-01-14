@@ -16,10 +16,9 @@ jobs:
         include:
           # manylinux x86_64
           - id: manylinux-x86_64
-            target: x86_64-unknown-linux-gnu
-            manylinux: auto
-            zig: true
-            args: --release --out dist --manylinux 2014
+            os: ubuntu-latest
+            manylinux: 2014
+            args: --release --out dist
 
           # manylinux aarch64 cross
           - id: manylinux-aarch64
