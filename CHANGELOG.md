@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.0a1] - 2026-01-14
+
+### 🚀 Major Rewrite (The Rust Era)
+- **Rust Core**: The entire core logic has been rewritten in Rust (`flashtext-rs`), providing massive performance gains and memory safety.
+- **Performance**: Throughput increased by **3x-4x** compared to v3.0 (Python). Match latency is now near-constant regardless of keyword count.
+- **Drop-in Compatible**: 100% API compatibility with the original FlashText and v3.x series.
+
+### Added
+- **True Unicode Boundaries**: Fixed the long-standing issue where non-ASCII characters (e.g., `é`, `ß`, `Adjancent CJK`) were incorrectly treated as delimiters. Rust's `unicode-segmentation` now handles word boundaries correctly for ALL languages.
+- **Universal Wheels**: Pre-compiled binary wheels for **macOS (Intel/Silicon)**, **Windows (x64)**, **Linux (x86_64/aarch64)**, and **Musl Linux (Alpine)**. No Rust compiler needed for users.
+- **JSON File Loading**: Native support for loading keywords from JSON files for faster startup.
+
+### Changed
+- **Packaging**: Migrated build system to `maturin` + `pyo3`.
+- **Minimum Python**: Now requires Python >= 3.8.
+
 ## [3.1.1] - 2026-01-13
 
 ### Refactoring (Architecture 3.0)
