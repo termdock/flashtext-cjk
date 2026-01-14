@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "flashtext-i18n"
-version = "4.0.0a7"
+version = "4.0.0a8"
 description = "Extract/Replace keywords in sentences. Fork with internationalization fixes for CJK and Unicode."
 readme = "README.md"
 license = { text = "MIT" }
@@ -53,3 +53,4 @@ python_files = ["test_*.py"]
 python-source = "src"
 module-name = "flashtext._core"
 bindings = "pyo3"
+manylinux = "2014"
