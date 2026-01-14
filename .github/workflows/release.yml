@@ -7,6 +7,59 @@ on:
   workflow_dispatch:
 
 jobs:
+  # manylinux wheels - following official maturin-action examples
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [x86_64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: auto
+          args: --release --out dist
+        env:
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
+      - name: Verify wheel
+        run: |
+          ls -la dist/
+          pip install dist/*.whl
+          python -c "from flashtext import KeywordProcessor; print('OK')"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-linux-${{ matrix.target }}
+          path: dist
+
+  linux-cross:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [aarch64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: auto
+          args: --release --out dist
+        env:
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-linux-${{ matrix.target }}
+          path: dist
+
+  # Other platforms
   build:
     name: Build wheels on ${{ matrix.id }}
     runs-on: ${{ matrix.os }}
@@ -14,19 +67,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # manylinux x86_64
-          - id: manylinux-x86_64
-            os: ubuntu-latest
-            target: x86_64
-            manylinux: auto
-            args: --release --out dist
-
-          # manylinux aarch64 cross
-          - id: manylinux-aarch64
-            os: ubuntu-latest
-            target: aarch64
-            manylinux: auto
-            args: --release --out dist
 
           # musllinux x86_64
           - id: musllinux-x86_64
@@ -39,14 +79,12 @@ jobs:
           - id: windows-x86_64
             os: windows-latest
             target: x86_64-pc-windows-msvc
-            manylinux: auto
             args: --release --out dist
 
           # macOS universal2
           - id: macos-universal2
             os: macos-latest
             target: universal2-apple-darwin
-            manylinux: auto
             args: --release --out dist
 
     steps:
@@ -73,7 +111,7 @@ jobs:
   publish-testpypi:
     name: Publish to TestPyPI
     if: github.event_name == 'workflow_dispatch'
-    needs: build
+    needs: [linux, linux-cross, build]
     runs-on: ubuntu-latest
     environment: testpypi
     permissions:
@@ -100,7 +138,7 @@ jobs:
   publish-pypi:
     name: Publish to PyPI
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
+    needs: [linux, linux-cross, build]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:

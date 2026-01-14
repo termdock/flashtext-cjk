@@ -112,3 +112,4 @@ how_to_test_setup_deploy.txt
 
 claude.mdbenchmarks/data/
 .venv_verify/*Cargo.lock
+.venv_verify/
