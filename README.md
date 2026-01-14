@@ -228,7 +228,7 @@ Comparison of **FlashText 4.0 (Rust)**, **FlashText 3.0 (Python)**, and **Regex 
 
 > **Note**: Rust match latency remains **nearly constant** as keyword count scales from 1k to 100k (on this corpus). Regex performance degrades sharply as the number of alternations grows, making it unsuitable for large keyword sets. Rust reduces per-character overhead and memory allocations, resulting in a consistent **2.6x to 3.6x** speedup over the Python implementation.
 
-![Match Time Benchmark](docs/img/match_time_short_low.png)
+![Match Time ![Benchmark](docs/img/benchmark.png)/match_time_short_low.png)
 *(Figure 1: Comparison vs Regex - Rust is 1000x faster)*
 
 ![Match Time Rust vs Python](docs/img/match_time_short_low_no_regex.png)

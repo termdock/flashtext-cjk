@@ -38,7 +38,7 @@ This project uses `maturin` and GitHub Actions for automated releases.
 ### 2. Verification
 Before releasing, always verify the package locally:
 ```bash
-./verify_package.sh
+./scripts/verify_package.sh
 ```
 If this passes (🎉 Package verification PASSED!), you are safe to proceed.
 
